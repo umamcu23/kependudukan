@@ -4,15 +4,28 @@
 
 @section('content')
 
-<div class="container-fluid mt-3">
-    <div class="card filter-card shadow-sm">
+<div class="container-fluid mt-4 filter-card-floating">
+
+    <!-- Filter Active Info -->
+    <div id="activeFilterInfo" class="mb-3" style="display: none;">
+        <div class="alert alert-info py-2 px-3 shadow-sm">
+            <strong>Filter Aktif:</strong>
+            <span id="badgeGender" class="badge bg-primary me-1"></span>
+            <span id="badgeUmur" class="badge bg-success me-1"></span>
+            <span id="badgeProvinsi" class="badge bg-warning text-dark me-1"></span>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 filter-card ">
         <div class="card-body">
             <div class="row g-3 align-items-end">
 
                 <!-- Jenis Kelamin -->
                 <div class="col-md-3">
-                    <label class="form-label fw-semibold">Jenis Kelamin</label>
-                    <select id="filterGender" class="form-select">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-gender-ambiguous me-1 text-primary"></i> Jenis Kelamin
+                    </label>
+                    <select id="filterGender" class="filter-select">
                         <option value="">Semua</option>
                         <option value="L">Laki-laki</option>
                         <option value="P">Perempuan</option>
@@ -21,8 +34,10 @@
 
                 <!-- Umur -->
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">Kelompok Umur</label>
-                    <select id="filterAge" class="form-select">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-people-fill me-1 text-success"></i> Kelompok Umur
+                    </label>
+                    <select id="filterAge" class="filter-select">
                         <option value="">Semua</option>
                         <option value="00-04">00-04</option>
                         <option value="05-09">05-09</option>
@@ -49,8 +64,10 @@
 
                 <!-- Provinsi -->
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">Provinsi</label>
-                    <select id="filterProvince" class="form-select">
+                    <label class="form-label fw-semibold">
+                        <i class="bi bi-geo-alt-fill me-1 text-danger"></i> Provinsi
+                    </label>
+                    <select id="filterProvince" class="filter-select">
                         <option value="">Semua</option>
                         @foreach($provinsi as $p)
                             <option value="{{ $p }}">{{ $p }}</option>
@@ -59,16 +76,14 @@
                 </div>
 
                 <!-- Button -->
-                <div class="col-md-1 d-grid">
-                   <button id="btnFilter" class="btn btn-primary btn-sm">
-                        <i class="bi bi-funnel"></i>
+                <div class="col-md-1 d-grid gap-2">
+                    <button id="btnFilter" class="btn btn-primary btn-sm shadow-sm">
+                        <i class="bi bi-funnel-fill"></i>
                     </button>
 
-                    <button id="btnRefresh" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-arrow-clockwise"></i>
+                    <button id="btnRefresh" class="btn btn-outline-secondary btn-sm shadow-sm">
+                        <i class="bi bi-x-circle"></i>
                     </button>
-
-                
                 </div>
 
             </div>
@@ -100,7 +115,7 @@
         <div class="col-md-4">
             <div class="card kpi-card bg-total h-100 text-center">
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <h6>Total Penduduk</h6>
+                    <h6>Total Penduduk Indonesia</h6>
                     <h1 class="fw-bold" id="totalPenduduk"></h1>
                     <small id="totalPendudukLabel">
                         Semua Provinsi • Semua Umur • Semua Gender
@@ -146,6 +161,18 @@
             </div>
         </div>
 
+         <div class="col-xl-12 mb-3">
+            <div class="card chart-card shadow-sm">
+                <div class="card-header">
+                    <i class="bi bi-geo-alt-fill text-success"></i>
+                    Penduduk per Provinsi
+                </div>
+                <div class="card-body">
+                    <div id="provinsiChart" class="chart"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="col-xl-6 mb-3">
            <div class="card chart-card shadow-sm">
                 <div class="card-header">
@@ -154,18 +181,6 @@
                 </div>
                 <div class="card-body">
                     <div id="genderChart" class="chart"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-6 mb-3">
-            <div class="card chart-card shadow-sm">
-                <div class="card-header">
-                    <i class="bi bi-geo-alt-fill text-success"></i>
-                    Penduduk per Provinsi
-                </div>
-                <div class="card-body">
-                    <div id="provinsiChart" class="chart"></div>
                 </div>
             </div>
         </div>
@@ -182,21 +197,7 @@
             </div>
         </div>
 
-        <div class="col-xl-6 mb-3">
-            <div class="card filter-card shadow-sm">
-                <div class="card chart-card shadow-sm">
-                    <div class="card-header">
-                        <i class="bi bi-bar-chart-steps text-warning"></i>
-                        Piramida Penduduk
-                    </div>
-                    <div class="card-body">
-                        <div id="pyramidChart" class="chart"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-6 mb-3">
+        <div class="col-xl-6 mb-3 d-none">
            <div class="card chart-card shadow-sm">
                 <div class="card-header">
                     <i class="bi bi-graph-up-arrow text-info"></i>
@@ -221,19 +222,22 @@
       </div>
       <div class="modal-body">
 
-        <div class="mb-3 d-flex justify-content-between align-items-center">
-          <span id="genderTotalPenduduk" class="fw-bold fs-5">0 orang</span>
+       
+        <div class="mb-3 d-flex justify-content-between align-items-center px-2">
+            <span id="genderTotalPenduduk" class="fw-bold fs-5">0 orang</span>
         </div>
 
         <div class="table-responsive">
-          <table id="genderTable" class="table table-striped table-hover table-bordered nowrap" style="width:100%">
-            <thead class="table-primary">
-              <!-- JS akan generate -->
-            </thead>
-            <tbody>
-              <!-- JS akan generate -->
-            </tbody>
-          </table>
+            <div id="genderTableContainer" style="overflow-x:auto; white-space:nowrap;">
+            <table id="genderTable" class="table table-striped table-hover table-bordered nowrap" style="width:100%">
+                <thead>
+                <!-- JS akan generate -->
+                </thead>
+                <tbody>
+                <!-- JS akan generate -->
+                </tbody>
+            </table>
+            </div>
         </div>
 
       </div>
@@ -250,10 +254,10 @@
 
 @push('scripts')
 
+
 <script>
-/* ==============================
-   LOAD ALL DASHBOARD
-================================ */
+let genderTable = null;
+let genderModalInstance = null;
 
 function clearFilter(){
     $('#filterGender').val('').trigger('change');
@@ -267,7 +271,6 @@ function loadDashboard() {
         .then(renderGenderChart);
     loadKpi();
     renderProvinsiChart();
-    renderPyramidChart();
     renderTrendChart();
     renderUmurGenderLineChart();
     renderProvinsiMap();
@@ -359,6 +362,7 @@ function renderGenderChart(data) {
         },
 
         series: [{
+            name: 'Penduduk',
             data: data.map(d => ({
                 name: d.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan',
                 y: Number(d.total),
@@ -374,102 +378,72 @@ function renderGenderChart(data) {
 function renderProvinsiChart() {
     const jenisKelaminFilter = document.querySelector('#filterGender').value || '';
     const umurFilter = document.querySelector('#filterAge').value || '';
-    
-    fetchJson('/dashboard/data/by-provinsi?' + queryParamsCommon())
-    .then(data => {
+    const provinsiFilter = document.querySelector('#filterProvince').value || '';
 
-        // ===============================
-        // SORT PROVINSI ASC (A → Z)
-        // ===============================
-        data.sort((a, b) => 
-            a.provinsi.localeCompare(b.provinsi, 'id')
-        );
+    // Kirim semua filter ke backend
+    const params = new URLSearchParams({
+        jenis_kelamin: jenisKelaminFilter,
+        umur: umurFilter,
+        provinsi: provinsiFilter
+    }).toString();
 
-        Highcharts.chart('provinsiChart', {
-            chart: {
-                type: 'column'
-            },
+    fetchJson('/dashboard/data/by-provinsi?' + params)
+        .then(data => {
 
-            title: {
-                text: null
-            },
+            // Sort ASC
+            data.sort((a, b) => a.provinsi.localeCompare(b.provinsi, 'id'));
 
-            xAxis: {
-                categories: data.map(d => d.provinsi),
-                labels: {
-                    rotation: -45
-                }
-            },
+            Highcharts.chart('provinsiChart', {
+                chart: { type: 'column' },
+                title: { text: null },
 
-            yAxis: {
-                title: {
-                    text: 'Jumlah Penduduk'
-                }
-            },
-
-            tooltip: {
-                pointFormat: '<b>{point.y:,.0f}</b> orang'
-            },
-
-            plotOptions: {
-                series: {
-                    dataLabels: {
-                        enabled: true,
-                        format: '{y:,.0f}',
-                        style: {
-                            fontWeight: 'bold',
-                            color: '#333'
-                        }
-                    }
+                xAxis: {
+                    categories: data.map(d => d.provinsi),
+                    labels: { rotation: -45 }
                 },
-                column: {
-                    cursor: 'pointer',
-                    point: {
-                        events: {
-                            click: function () {
-                                loadProvinsiDetail(this.category, jenisKelaminFilter, umurFilter);
+
+                yAxis: {
+                    title: { text: 'Jumlah Penduduk' }
+                },
+
+                tooltip: { pointFormat: '<b>{point.y:,.0f}</b> orang' },
+
+                plotOptions: {
+                    series: {
+                        dataLabels: {
+                            enabled: true,
+                            format: '{y:,.0f}',
+                            style: { fontWeight: 'bold', color: '#333' }
+                        }
+                    },
+                    column: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    loadProvinsiDetail(
+                                        this.category,
+                                        jenisKelaminFilter,
+                                        umurFilter,
+                                        this.name
+                                    );
+                                }
                             }
                         }
                     }
-                }
-            },
+                },
 
-            series: [{
-                name: 'Penduduk',
-                data: data.map(d => Number(d.total))
-            }]
+                series: [{
+                    name: 'Penduduk',
+                    data: data.map(d => ({
+                        name: d.provinsi,
+                        y: Number(d.total),
+                        gender_code: d.jenis_kelamin
+                    }))
+                }]
+            });
         });
-    });
 }
-
-
-/* ==============================
-   PYRAMID UMUR
-================================ */
-function renderPyramidChart() {
-    fetchJson('/dashboard/data/by-umur?' + queryParamsCommon())
-    .then(data => {
-
-        const map = {};
-        data.forEach(d => {
-            map[d.umur] ??= { L: 0, P: 0 };
-            map[d.umur][d.jenis_kelamin] = Number(d.total);
-        });
-
-        const umur = Object.keys(map);
-
-        Highcharts.chart('pyramidChart', {
-            chart: { type: 'bar' },
-            title: { text: null },
-            xAxis: { categories: umur },
-            series: [
-                { name:'Laki-laki', data: umur.map(u => -map[u].L) },
-                { name:'Perempuan', data: umur.map(u => map[u].P) }
-            ]
-        });
-    });
-}
-
 
 /* ==============================
    TREND LINE
@@ -489,29 +463,16 @@ function renderTrendChart() {
     });
 }
 
-
-/* ==============================
-   FILTER PARAMS
-================================ */
-// function queryParamsCommon() {
-//     return new URLSearchParams({
-//         jenis_kelamin: filterGender.value,
-//         umur: filterAge.value,
-//         provinsi: filterProvince.value
-//     }).toString();
-// }
-
 function queryParamsCommon() {
+    const gender = document.querySelector('#filterGender').value || '';
+    const umur = document.querySelector('#filterAge').value || '';
+    const prov = document.querySelector('#filterProvince').value || '';
+
     const params = new URLSearchParams();
 
-    if (filterGender.value)
-        params.append('jenis_kelamin', filterGender.value);
-
-    if (filterAge.value)
-        params.append('umur', filterAge.value);
-
-    if (filterProvince.value)
-        params.append('provinsi', filterProvince.value);
+    if (gender) params.append('jenis_kelamin', gender);
+    if (umur) params.append('umur', umur);
+    if (prov) params.append('provinsi', prov);
 
     return params.toString();
 }
@@ -543,64 +504,132 @@ btnFilter.addEventListener('click', function() {
 /* ==============================
    MODAL + DATATABLE
 ================================ */
-let genderTable = null;
-let genderModalInstance = null;
 
 function loadGenderDetail(gender, title) {
     document.getElementById('genderModalTitle').innerText =
         `Detail Penduduk - ${title}`;
 
     // destroy DataTable kalau ada
-    if (genderTable) {
-        genderTable.destroy();
-        genderTable = null;
-    }
+    resetGenderTable();
+
 
     fetch(`/dashboard/data/detail-gender-pivot/${gender}?${queryParamsCommon()}`)
         .then(res => res.json())
         .then(res => {
 
+            // HITUNG TOTAL
+            let total = 0;
+            res.data.forEach(row => {
+                res.umur.forEach(u => {
+                    total += Number(row[u] || 0);
+                });
+            });
+            document.getElementById('genderTotalPenduduk').innerText =
+                total.toLocaleString('id-ID') + " orang";
+
             // HEADER
             let thead = `
                 <tr>
+                    <th width="5%">No</th>
                     <th>Provinsi</th>
                     <th>Jenis Kelamin</th>
             `;
-
             res.umur.forEach(u => {
                 thead += `<th class="text-end">${u}</th>`;
             });
-
-            thead += '</tr>';
+            thead += `</tr>`;
 
             // BODY
             let tbody = '';
-            res.data.forEach(row => {
+            res.data.forEach((row, i) => {
                 tbody += `
                     <tr>
+                        <td>${i + 1}</td>
                         <td>${row.provinsi}</td>
-                        <td>${row.jenis_kelamin === 'L'
-                            ? 'Laki-laki'
-                            : 'Perempuan'}
-                        </td>
+                        <td>${row.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}</td>
                 `;
-
                 res.umur.forEach(u => {
                     tbody += `
                         <td class="text-end">
-                            ${Number(row[u] || 0).toLocaleString()}
+                            ${Number(row[u] || 0).toLocaleString('id-ID')}
                         </td>`;
                 });
-
                 tbody += `</tr>`;
             });
 
             document.querySelector('#genderTable thead').innerHTML = thead;
             document.querySelector('#genderTable tbody').innerHTML = tbody;
 
-            showGenderModal();
+            // Inisialisasi DataTable (pakai jQuery DataTables API)
+            // Pastikan kamu sudah include DataTables + Buttons + Responsive libs
+            genderTable = $('#genderTable').DataTable({
+                destroy: true,
+                scrollX: true,
+                scrollCollapse: true,
+                paging: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,        // penting untuk mencegah perhitungan width otomatis yang salah
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copyHtml5', title: `Detail Penduduk - ${title}` },
+                    { extend: 'excelHtml5', title: `Detail Penduduk - ${title}` },
+                    { extend: 'csvHtml5', title: `Detail Penduduk - ${title}` },
+                    {
+                        extend: 'pdfHtml5',
+                        title: `Detail Penduduk - ${title}`,
+                        orientation: 'landscape',
+                        pageSize: 'A4'
+                    },
+                    { extend: 'print', title: `Detail Penduduk - ${title}` }
+                ],
+                columnDefs: [
+                    { className: 'text-end', targets: res.umur.length ? Array.from({length: res.umur.length}, (_,i)=>i+3) : [] }
+                    // note: targets here are indexes of umur columns (adjust if needed)
+                ]
+            });
+
+            // Buka modal (satu instance bootstrap)
+            if (!genderModalInstance) {
+                genderModalInstance = new bootstrap.Modal(document.getElementById('genderModal'), {
+                    backdrop: true,
+                    keyboard: true
+                });
+            }
+            genderModalInstance.show();
         });
 }
+
+// Pastikan DataTables men-adjust kolom setelah modal benar-benar tampil
+$('#genderModal').on('shown.bs.modal', function () {
+    // kalau genderTable sudah inisialisasi, paksa adjust + responsive recalc + draw
+    if (genderTable && typeof genderTable.columns === 'function') {
+        // delay kecil untuk memastikan layout DOM stabil
+        setTimeout(function () {
+            try {
+                genderTable.columns.adjust();
+                if (genderTable.responsive && typeof genderTable.responsive.recalc === 'function') {
+                    genderTable.responsive.recalc();
+                }
+                genderTable.draw(false); // false -> tidak ubah page
+            } catch (e) {
+                // fallback: jika instance berbeda (DataTables 2.x / new DataTable), coba alternatif:
+                try {
+                    // for new DataTable() API
+                    const dtApi = $('#genderTable').DataTable();
+                    dtApi.columns.adjust();
+                    if (dtApi.responsive) dtApi.responsive.recalc();
+                    dtApi.draw(false);
+                } catch (err) {
+                    console.warn('Columns adjust failed', err);
+                }
+            }
+        }, 50); // 50ms cukup di kebanyakan kasus
+    }
+});
+
 
 
 function showGenderModal() {
@@ -628,16 +657,16 @@ function showGenderModal() {
             autoWidth: false,
             dom: 'Bfrtip', // tombol akan muncul
             buttons: [
+                { extend: 'copyHtml5', title: `Detail Penduduk - ${title}` },
+                { extend: 'excelHtml5', title: `Detail Penduduk - ${title}` },
+                { extend: 'csvHtml5', title: `Detail Penduduk - ${title}` },
                 {
-                    extend: 'csvHtml5',
-                    text: 'Export CSV',
-                    title: 'Detail_Penduduk'
+                    extend: 'pdfHtml5',
+                    title: `Detail Penduduk - ${title}`,
+                    orientation: 'landscape',
+                    pageSize: 'A4'
                 },
-                {
-                    extend: 'excelHtml5',
-                    text: 'Export Excel',
-                    title: 'Detail_Penduduk'
-                }
+                { extend: 'print', title: `Detail Penduduk - ${title}` }
             ],
             columnDefs: [
                 { className: 'text-end', targets: '_all' }
@@ -673,8 +702,8 @@ function loadKpi() {
         
         // Misal filter aktif
         const filters = {
-            umur: getFilterUmur(),          // function ambil value select umur
-            gender: getFilterGender()       // function ambil value select gender
+            // umur: getFilterUmur(),          // function ambil value select umur
+            // gender: getFilterGender()       // function ambil value select gender
         };
 
         // total sesuai filter
@@ -682,9 +711,29 @@ function loadKpi() {
         if (filters.gender === 'L') totalPenduduk = res.laki_laki;
         if (filters.gender === 'P') totalPenduduk = res.perempuan;
 
-        updateTotalPendudukKPI(filters, totalPenduduk);
+        // updateTotalPendudukKPI(filters, totalPenduduk);
     });
 }
+
+function resetGenderTable() {
+
+    // Destroy jika sudah jadi DataTable
+    if ($.fn.DataTable.isDataTable('#genderTable')) {
+        $('#genderTable').DataTable().clear().destroy();
+    }
+
+    // Hapus wrapper DataTables (penting!)
+    $('#genderTable').closest('.dataTables_wrapper').remove();
+
+    // Rebuild tabel kosong
+    document.getElementById('genderTableContainer').innerHTML = `
+        <table id="genderTable" class="table table-bordered table-striped w-auto">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    `;
+}
+
 
 /**
  * Animate Number (Count Up)
@@ -721,13 +770,11 @@ document.getElementById('btnRefresh').addEventListener('click', () => {
 });
 
 let provinsiTable = null;
+function loadProvinsiDetail(provinsi, jenisKelaminFilter, umurFilter, title) {
+    document.getElementById('genderModalTitle').innerText =
+        `Detail Penduduk - ${title}`;
 
-function loadProvinsiDetail(provinsi, jenisKelaminFilter, umurFilter) {
-
-    if (genderTable) {
-        genderTable.destroy();
-        genderTable = null;
-    }
+    resetGenderTable();
 
     const params = new URLSearchParams({
         provinsi: provinsi,
@@ -736,51 +783,110 @@ function loadProvinsiDetail(provinsi, jenisKelaminFilter, umurFilter) {
     }).toString();
 
     fetch(`/dashboard/data/detail-provinsi-pivot/${encodeURIComponent(provinsi)}?${params}`)
-
         .then(res => res.json())
         .then(res => {
 
+            // ======================
+            // FILTER UMUR & GENDER
+            // ======================
+            let umurList = res.umur;
+            if (umurFilter) {
+                umurList = umurList.filter(u => u === umurFilter);
+            }
+
+            let dataRows = res.data;
+            if (jenisKelaminFilter) {
+                dataRows = dataRows.filter(r => r.jenis_kelamin === jenisKelaminFilter);
+            }
+
+            // ======================
+            // HITUNG TOTAL
+            // ======================
+            let total = 0;
+            dataRows.forEach(row => {
+                umurList.forEach(u => {
+                    total += Number(row[u] || 0);
+                });
+            });
+            document.getElementById('genderTotalPenduduk').innerText =
+                total.toLocaleString('id-ID') + " orang";
+
+            // ======================
+            // BUILD HEADER TABEL
+            // ======================
             let thead = `
                 <tr>
+                    <th width="5%">No</th>
                     <th>Provinsi</th>
                     <th>Jenis Kelamin</th>
             `;
 
-            res.umur.forEach(u => {
+            umurList.forEach(u => {
                 thead += `<th class="text-end">${u}</th>`;
             });
 
-            thead += '</tr>';
+            thead += `</tr>`;
 
+            // ======================
+            // BUILD BODY TABEL
+            // ======================
             let tbody = '';
-            res.data.forEach(row => {
+            let no = 1;
+
+            dataRows.forEach(row => {
                 tbody += `
                     <tr>
+                        <td>${no++}</td>
                         <td>${row.provinsi}</td>
-                        <td>${row.jenis_kelamin === 'L'
-                            ? 'Laki-laki'
-                            : 'Perempuan'}
-                        </td>
+                        <td>${row.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan"}</td>
                 `;
 
-                res.umur.forEach(u => {
+                umurList.forEach(u => {
                     tbody += `
-                        <td class="text-end">
-                            ${Number(row[u]).toLocaleString()}
-                        </td>`;
+                        <td class="text-end">${Number(row[u] || 0).toLocaleString()}</td>
+                    `;
                 });
 
-                tbody += '</tr>';
+                tbody += `</tr>`;
             });
-            
-            document.querySelector('#genderTable thead').innerHTML = thead;
-            document.querySelector('#genderTable tbody').innerHTML = tbody;
 
-            new bootstrap.Modal(
-                document.getElementById('genderModal')
-            ).show();
+            document.querySelector("#genderTable thead").innerHTML = thead;
+            document.querySelector("#genderTable tbody").innerHTML = tbody;
+
+            // ======================
+            // DATATABLES
+            // ======================
+            genderTable = new DataTable('#genderTable', {
+                paging: true,
+                pageLength: 10,
+                responsive: false,   // MATIKAN! supaya scroll horizontal berfungsi
+                scrollX: true,       // HIDUPKAN SCROLL X
+                autoWidth: false,
+                searching: true,
+                ordering: false,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copyHtml5', title: `Detail Penduduk - ${title}` },
+                    { extend: 'excelHtml5', title: `Detail Penduduk - ${title}` },
+                    { extend: 'csvHtml5', title: `Detail Penduduk - ${title}` },
+                    {
+                        extend: 'pdfHtml5',
+                        title: `Detail Penduduk - ${title}`,
+                        orientation: 'landscape',
+                        pageSize: 'A4'
+                    },
+                    { extend: 'print', title: `Detail Penduduk - ${title}` }
+                ]
+            });
+
+            if (!genderModalInstance) {
+                genderModalInstance = new bootstrap.Modal(document.getElementById('genderModal'));
+            }
+            genderModalInstance.show();
+
         });
 }
+
 
 function renderUmurGenderLineChart() {
     const provinsiFilter = document.querySelector('#filterProvince').value || '';
@@ -788,109 +894,177 @@ function renderUmurGenderLineChart() {
     const umurFilter = document.querySelector('#filterAge').value || '';
 
     let queryParams = [];
-    if(provinsiFilter) queryParams.push(`provinsi=${encodeURIComponent(provinsiFilter)}`);
-    if(jenisKelaminFilter) queryParams.push(`jenis_kelamin=${encodeURIComponent(jenisKelaminFilter)}`);
-    if(umurFilter) queryParams.push(`umur=${encodeURIComponent(umurFilter)}`);
+    if (provinsiFilter) queryParams.push(`provinsi=${encodeURIComponent(provinsiFilter)}`);
+    if (jenisKelaminFilter) queryParams.push(`jenis_kelamin=${encodeURIComponent(jenisKelaminFilter)}`);
+    if (umurFilter) queryParams.push(`umur=${encodeURIComponent(umurFilter)}`);
     const queryString = queryParams.join('&');
 
     fetchJson('/dashboard/data/umur-by-gender?' + queryString)
-    .then(data => {
-        const umurSet = new Set(), male = {}, female = {};
-        data.forEach(d=>{
-            umurSet.add(d.umur);
-            if(d.jenis_kelamin==='L') male[d.umur]=Number(d.total);
-            else if(d.jenis_kelamin==='P') female[d.umur]=Number(d.total);
-        });
+        .then(data => {
+            const umurSet = new Set(), male = {}, female = {};
 
-        const umur = Array.from(umurSet);
+            data.forEach(d => {
+                umurSet.add(d.umur);
+                if (d.jenis_kelamin === 'L') male[d.umur] = Number(d.total);
+                else if (d.jenis_kelamin === 'P') female[d.umur] = Number(d.total);
+            });
 
-        Highcharts.chart('umurGenderLineChart', {
-            chart: { type: 'line' },
-            title: { text: '' },
-            xAxis: { categories: umur, title: { text: 'Kelompok Umur' } },
-            yAxis: { title: { text: 'Jumlah Penduduk' }, labels:{formatter(){return this.value.toLocaleString('id-ID')}} },
-            tooltip: { shared: false, valueSuffix: ' orang' },
-            legend: { enabled: true },
-            plotOptions: {
-                series: {
-                    cursor: 'pointer',
-                    point: {
-                    events: {
-                        click: function() {
-                            const umurClicked = this.umur;
-                            const genderCode = this.gender;
-                            const genderText = genderCode==='L'?'Laki-laki':'Perempuan';
+            const umur = Array.from(umurSet);
 
-                            const provinsiFilter = document.querySelector('#filterProvince').value || '';
-                            const jenisKelaminFilter = document.querySelector('#filterGender').value || '';
+            // ==============================
+            //  FILTER SERIES BERDASARKAN JENIS KELAMIN
+            // ==============================
+            let series = [];
 
-                            document.getElementById('genderModalTitle').innerText =
-                                `Detail Penduduk ${genderText} Umur ${umurClicked}`;
+            if (jenisKelaminFilter === '' || jenisKelaminFilter === 'L') {
+                series.push({
+                    name: 'Laki-laki',
+                    color: '#2CAFFE',
+                    data: umur.map(u => ({ y: male[u] || 0, umur: u, gender: 'L' }))
+                });
+            }
 
-                            // Kirim semua filter aktif + titik diklik
-                            let pivotQuery = `?umur=${encodeURIComponent(umurClicked)}`;
-                            if(provinsiFilter) pivotQuery += `&provinsi=${encodeURIComponent(provinsiFilter)}`;
-                            if(jenisKelaminFilter) pivotQuery += `&jenis_kelamin=${encodeURIComponent(jenisKelaminFilter)}`;
+            if (jenisKelaminFilter === '' || jenisKelaminFilter === 'P') {
+                series.push({
+                    name: 'Perempuan',
+                    color: '#544FC5',
+                    data: umur.map(u => ({ y: female[u] || 0, umur: u, gender: 'P' }))
+                });
+            }
 
-                            fetch(`/dashboard/data/detail-gender-pivot/${genderCode}${pivotQuery}`)
-                            .then(res=>res.json())
-                            .then(res=>{
-                                let tbody='', total=0;
-                                res.data.forEach(row=>{
-                                    const jml = Number(row[umurClicked] || 0);
-                                    if(jml > 0){ // hanya tampilkan row yg ada jumlah
-                                        total += jml;
-                                        tbody += `<tr>
-                                            <td>${row.provinsi}</td>
-                                            <td>${genderText}</td>
-                                            <td class="text-end">${jml.toLocaleString('id-ID')}</td>
-                                        </tr>`;
-                                    }
-                                });
+            Highcharts.chart('umurGenderLineChart', {
+                chart: { type: 'line' },
+                title: { text: '' },
 
+                xAxis: {
+                    categories: umur,
+                    title: { text: 'Kelompok Umur' }
+                },
 
-                                document.getElementById('genderTotalPenduduk').innerText = total.toLocaleString('id-ID') + ' orang';
-
-                                 // Hapus DataTable lama jika ada
-                                if ($.fn.DataTable.isDataTable('#genderTable')) {
-                                    $('#genderTable').DataTable().destroy();
-                                }
-
-                                // Masukkan HTML baru
-                                document.querySelector('#genderTable thead').innerHTML = `
-                                    <tr>
-                                        <th>Provinsi</th>
-                                        <th>Jenis Kelamin</th>
-                                        <th class="text-end">${umurClicked}</th>
-                                    </tr>
-                                `;
-                                document.querySelector('#genderTable tbody').innerHTML = tbody;
-
-                                // Re-init DataTable
-                                $('#genderTable').DataTable({
-                                    dom: 'Bfrtip',
-                                    buttons: ['copy','excel','csv','pdf'],
-                                    paging: true,
-                                    searching: true,
-                                    ordering: true,
-                                });
-
-
-                                new bootstrap.Modal(document.getElementById('genderModal')).show();
-                            });
+                yAxis: {
+                    title: { text: 'Jumlah Penduduk' },
+                    labels: {
+                        formatter() {
+                            return this.value.toLocaleString('id-ID');
                         }
                     }
-                }
-
                 },
-                line:{marker:{enabled:true,radius:4},dataLabels:{enabled:true,allowOverlap:false,formatter(){return this.point.index===this.series.data.length-1?this.y.toLocaleString('id-ID'):null},align:'left',x:14,style:{fontWeight:'bold'}}}
-            },
-            series:[
-                { name:'Laki-laki', color:'#2CAFFE', data:umur.map(u=>({y:male[u]||0,umur:u,gender:'L'})) },
-                { name:'Perempuan', color:'#544FC5', data:umur.map(u=>({y:female[u]||0,umur:u,gender:'P'})) }
-            ]
+
+                tooltip: {
+                    shared: false,
+                    valueSuffix: ' orang'
+                },
+
+                legend: { enabled: true },
+
+                plotOptions: {
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                    const umurClicked = this.umur;
+                                    const genderCode = this.gender;
+                                    const genderText = genderCode === 'L' ? 'Laki-laki' : 'Perempuan';
+
+                                    const provinsiFilter = document.querySelector('#filterProvince').value || '';
+                                    const jenisKelaminFilter = document.querySelector('#filterGender').value || '';
+
+                                    document.getElementById('genderModalTitle').innerText =
+                                        `Detail Penduduk - ${genderText} Umur ${umurClicked}`;
+
+                                    resetGenderTable();
+
+                                    let pivotQuery = `?umur=${encodeURIComponent(umurClicked)}`;
+                                    if (provinsiFilter) pivotQuery += `&provinsi=${encodeURIComponent(provinsiFilter)}`;
+                                    if (jenisKelaminFilter) pivotQuery += `&jenis_kelamin=${encodeURIComponent(jenisKelaminFilter)}`;
+
+                                    fetch(`/dashboard/data/detail-gender-pivot/${genderCode}${pivotQuery}`)
+                                        .then(res => res.json())
+                                        .then(res => {
+                                            let tbody = '', total = 0;
+
+                                            res.data.forEach((row, i) => {
+                                                const jml = Number(row[umurClicked] || 0);
+                                                if (jml > 0) {
+                                                    total += jml;
+                                                    tbody += `
+                                                        <tr>
+                                                            <td>${i + 1}</td>
+                                                            <td>${row.provinsi}</td>
+                                                            <td>${genderText}</td>
+                                                            <td class="text-end">${jml.toLocaleString('id-ID')}</td>
+                                                        </tr>`;
+                                                }
+                                            });
+
+                                            // TOTAL
+                                            document.getElementById('genderTotalPenduduk').innerText =
+                                                total.toLocaleString('id-ID') + ' orang';
+
+                                            // HEADER TABEL
+                                            document.querySelector('#genderTable thead').innerHTML = `
+                                                <tr>
+                                                    <th width="5%">No</th>
+                                                    <th>Provinsi</th>
+                                                    <th>Jenis Kelamin</th>
+                                                    <th class="text-end">${umurClicked}</th>
+                                                </tr>
+                                            `;
+
+                                            // ISI TABEL
+                                            document.querySelector('#genderTable tbody').innerHTML = tbody;
+
+                                            // Re-init DataTable
+                                            genderTable = $('#genderTable').DataTable({
+                                                autoWidth: false,
+                                                scrollX: true,
+                                                paging: true,
+                                                searching: true,
+                                                ordering: true,
+                                                dom: 'Bfrtip',
+                                                buttons: [
+                                                    { extend: 'copyHtml5', title: `Detail Penduduk - Berdasarkan Umur` },
+                                                    { extend: 'excelHtml5', title: `Detail Penduduk - Berdasarkan Umur` },
+                                                    { extend: 'csvHtml5', title: `Detail Penduduk - Berdasarkan Umur` },
+                                                    {
+                                                        extend: 'pdfHtml5',
+                                                        title: `Detail Penduduk - Berdasarkan Umur`,
+                                                        orientation: 'landscape',
+                                                        pageSize: 'A4'
+                                                    },
+                                                    { extend: 'print', title: `Detail Penduduk - Berdasarkan Umur` }
+                                                ]
+                                            });
+
+                                            new bootstrap.Modal(document.getElementById('genderModal')).show();
+                                        });
+                                }
+                            }
+                        }
+                    },
+
+                    line: {
+                        marker: { enabled: true, radius: 4 },
+                        dataLabels: {
+                            enabled: true,
+                            allowOverlap: false,
+                            formatter() {
+                                return this.point.index === this.series.data.length - 1
+                                    ? this.y.toLocaleString('id-ID')
+                                    : null;
+                            },
+                            align: 'left',
+                            x: 14,
+                            style: { fontWeight: 'bold' }
+                        }
+                    }
+                },
+
+                // APPLY FILTER SERIES
+                series: series
+            });
         });
-    });
 }
 
 
@@ -1122,12 +1296,10 @@ function renderProvinsiMap() {
 }
 
 // let genderTable = null;
-
 function openProvinsiMapDetail(provinsi, jenisKelaminFilter, umurFilter) {
     document.getElementById('genderModalTitle').innerText =
-        `Detail Penduduk Provinsi ${provinsi}`;
+        `Detail Penduduk - Provinsi ${provinsi}`;
 
-    // Hapus DataTable lama
     if ($.fn.DataTable.isDataTable('#genderTable')) {
         $('#genderTable').DataTable().destroy();
     }
@@ -1142,49 +1314,108 @@ function openProvinsiMapDetail(provinsi, jenisKelaminFilter, umurFilter) {
         .then(res => res.json())
         .then(res => {
 
-            // Hitung total penduduk
+            // ----------------------------
+            // 1️⃣ TENTUKAN UMUR YANG DITAMPILKAN
+            // ----------------------------
+            let umurList = res.umur;
+
+            if (umurFilter && umurFilter !== '') {
+                // hanya tampil 1 kolom umur
+                umurList = [umurFilter];
+            }
+
+            // ----------------------------
+            // 2️⃣ FILTER DATA BERDASARKAN JENIS KELAMIN
+            // ----------------------------
+            let dataFiltered = res.data;
+
+            if (jenisKelaminFilter && jenisKelaminFilter !== '') {
+                dataFiltered = res.data.filter(d => d.jenis_kelamin === jenisKelaminFilter);
+            }
+
+            // ----------------------------
+            // 3️⃣ HITUNG GRAND TOTAL
+            // ----------------------------
             let grandTotal = 0;
-            res.data.forEach(row => {
-                res.umur.forEach(u => {
+            dataFiltered.forEach(row => {
+                umurList.forEach(u => {
                     grandTotal += Number(row[u] || 0);
                 });
             });
+
             document.getElementById('genderTotalPenduduk').innerText =
                 grandTotal.toLocaleString('id-ID') + ' orang';
 
-            // Header tabel
-            let thead = `<tr><th>Jenis Kelamin</th>`;
-            res.umur.forEach(u => thead += `<th class="text-end">${u}</th>`);
+            // ----------------------------
+            // 4️⃣ HEADER TABEL DINAMIS
+            // ----------------------------
+            let thead = `<tr>
+                <th>No</th>
+                <th>Jenis Kelamin</th>`;
+
+            umurList.forEach(u => {
+                thead += `<th class="text-end">${u}</th>`;
+            });
+
             thead += `<th class="text-end">Total</th></tr>`;
 
-            // Body tabel
+            // ----------------------------
+            // 5️⃣ BODY TABEL DINAMIS
+            // ----------------------------
             let tbody = '';
-            res.data.forEach(row => {
+
+            dataFiltered.forEach((row, i) => {
                 let total = 0;
-                tbody += `<tr><td>${row.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}</td>`;
-                res.umur.forEach(u => {
+                tbody += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${row.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}</td>`;
+
+                umurList.forEach(u => {
                     const val = Number(row[u] || 0);
                     total += val;
                     tbody += `<td class="text-end">${val.toLocaleString('id-ID')}</td>`;
                 });
-                tbody += `<td class="text-end fw-bold">${total.toLocaleString('id-ID')}</td></tr>`;
+
+                tbody += `<td class="text-end fw-bold">${total.toLocaleString('id-ID')}</td>
+                </tr>`;
             });
 
+            // Tempel HTML
             document.querySelector('#genderTable thead').innerHTML = thead;
             document.querySelector('#genderTable tbody').innerHTML = tbody;
 
-            // Init DataTable baru
+            // ----------------------------
+            // 6️⃣ RE-INIT DATATABLE
+            // ----------------------------
             genderTable = $('#genderTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: ['copy', 'excel', 'csv', 'pdf'],
+                destroy: true,
+                scrollX: true,
+                scrollCollapse: true,
                 paging: true,
                 searching: true,
                 ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'copyHtml5', title: `Detail Penduduk - Provinsi ${provinsi}` },
+                    { extend: 'excelHtml5', title: `Detail Penduduk - Provinsi ${provinsi}` },
+                    { extend: 'csvHtml5', title: `Detail Penduduk - Provinsi ${provinsi}` },
+                    {
+                        extend: 'pdfHtml5',
+                        title: `Detail Penduduk - Provinsi ${provinsi}`,
+                        orientation: 'landscape',
+                        pageSize: 'A4'
+                    },
+                    { extend: 'print', title: `Detail Penduduk - Provinsi ${provinsi}` }
+                ]
             });
 
             showGenderModal();
         });
 }
+
 
 function toHcKey(prov) {
     return prov
@@ -1193,5 +1424,61 @@ function toHcKey(prov) {
         .replace(/\./g, '')
         .replace(/ /g, '-');
 }
+
+function updateFilterBadges() {
+    const gender = document.getElementById("filterGender").value;
+    const umur = document.getElementById("filterAge").value;
+    const prov = document.getElementById("filterProvince").value;
+
+    let active = false;
+
+    // Reset badge
+    document.getElementById("badgeGender").style.display = "none";
+    document.getElementById("badgeUmur").style.display = "none";
+    document.getElementById("badgeProvinsi").style.display = "none";
+
+    // Gender
+    if (gender) {
+        document.getElementById("badgeGender").innerText =
+            gender === "L" ? "Laki-laki" : "Perempuan";
+        document.getElementById("badgeGender").style.display = "inline-block";
+        active = true;
+    }
+
+    // Umur
+    if (umur) {
+        document.getElementById("badgeUmur").innerText = `Umur ${umur}`;
+        document.getElementById("badgeUmur").style.display = "inline-block";
+        active = true;
+    }
+
+    // Provinsi
+    if (prov) {
+        document.getElementById("badgeProvinsi").innerText = prov;
+        document.getElementById("badgeProvinsi").style.display = "inline-block";
+        active = true;
+    }
+
+    // Show / hide container
+    document.getElementById("activeFilterInfo").style.display = active ? "block" : "none";
+}
+
+// Event listener
+["filterGender", "filterAge", "filterProvince"].forEach(id => {
+    document.getElementById(id).addEventListener("change", updateFilterBadges);
+});
+
+document.getElementById("btnRefresh").addEventListener("click", () => {
+    document.getElementById("filterGender").value = "";
+    document.getElementById("filterAge").value = "";
+    document.getElementById("filterProvince").value = "";
+
+    updateFilterBadges();
+});
+
+// GLOBAL MODAL INSTANCE
+genderModalInstance = new bootstrap.Modal(document.getElementById('genderModal'));
+
 </script>
 @endpush
+

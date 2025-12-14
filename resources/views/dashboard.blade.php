@@ -1273,19 +1273,17 @@ function renderProvinsiMap() {
                     enabled: true,
                     allowOverlap: true,
                     formatter() {
-                        if (this.point.isTop) {
-                            return `
-                                <b>${this.point.realValue
-                                    .toLocaleString('id-ID')}</b>
-                            `;
-                        }
-                        return null;
+                        // tampilkan total penduduk di SEMUA provinsi
+                        return this.point.realValue
+                            ? this.point.realValue.toLocaleString('id-ID')
+                            : null;
                     },
                     style: {
                         fontWeight: 'bold',
-                        fontSize: '11px',
+                        fontSize: '10px',
                         color: '#000',
-                        textOutline: '2px contrast'
+                        textOutline: '1px contrast',
+                        pointerEvents: 'none' // 🔥 WAJIB agar hover & zoom tetap aktif
                     }
                 }
             }]

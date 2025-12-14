@@ -4,8 +4,80 @@
 
 @section('content')
 
-<div class="container-fluid mt-4 filter-card-floating">
+<style>
+    /* Floating filter container */
+.filter-card-floating {
+    top: 80px;
+    left: 20px;
+    z-index: 1050;
+    max-width: calc(100% - 40px);
+}
 
+/* Filter card animation */
+#filterCard {
+    transition: all 0.3s ease;
+}
+
+/* Hidden state */
+#filterCard.hide {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
+
+/* Toggle button floating */
+.toggle-filter-btn {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1060;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Show toggle button when filter hidden */
+.toggle-filter-btn.show {
+    display: flex;
+}
+
+/* Efek hover */
+#toggleFilterBtn:hover {
+    transform: translateY(-2px);
+        box-shadow: 0px 6px 14px rgba(0,0,0,0.1);
+}
+
+/* Membuat card terlihat mengapung */
+#toggleFilterBtn {
+    transform: translateZ(0);
+}
+
+/* Efek hover */
+#hideFilter:hover {
+    border-radius: 20px;
+    transform: translateY(-2px);
+    box-shadow: 0px 6px 14px rgba(0,0,0,0.1);
+}
+
+/* Membuat card terlihat mengapung */
+#hideFilter {
+    transform: translateZ(0);
+}
+
+
+</style>
+
+<!-- Toggle Button -->
+<button id="toggleFilterBtn"
+    class="btn shadow toggle-filter-btn text-white" style="background: linear-gradient(to top, #383ac8a8, #bd09eb)"
+    title="Tampilkan / Sembunyikan Filter">
+    <i class="bi bi-sliders" ></i>
+</button>
+
+<div class="container-fluid mt-4 filter-card-floating" id="filterCard">
     <!-- Filter Active Info -->
     <div id="activeFilterInfo" class="mb-3" style="display: none;">
         <div class="alert alert-info py-2 px-3 shadow-sm">
@@ -16,10 +88,15 @@
         </div>
     </div>
 
-    <div class="card shadow-sm border-0 filter-card ">
+    <div class="card shadow-sm border-0 filter-card " >
         <div class="card-body">
             <div class="row g-3 align-items-end">
-
+                <div class="d-flex justify-content-end mb-2">
+                    <button class="btn btn-sm btn-light" onclick="hideFilter()" id="hideFilter">
+                        Hide
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                </div>
                 <!-- Jenis Kelamin -->
                 <div class="col-md-3">
                     <label class="form-label fw-semibold">
@@ -1476,6 +1553,20 @@ document.getElementById("btnRefresh").addEventListener("click", () => {
 
 // GLOBAL MODAL INSTANCE
 genderModalInstance = new bootstrap.Modal(document.getElementById('genderModal'));
+
+const toggleBtn  = document.getElementById('toggleFilterBtn');
+const filterCard = document.getElementById('filterCard');
+
+toggleBtn.addEventListener('click', () => {
+    filterCard.classList.remove('hide');
+    toggleBtn.classList.remove('show');
+});
+
+// tombol kecil di dalam filter (opsional)
+const hideFilter = () => {
+    filterCard.classList.add('hide');
+    toggleBtn.classList.add('show');
+};
 
 </script>
 @endpush
